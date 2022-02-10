@@ -38,7 +38,7 @@ else null]]></ee:set-variable>
 		<logger level="INFO" doc:name="Logger" doc:id="67f04b3e-9d98-4686-acdc-8ff76e5e5100" message="#[payload]" />
 		<http:request method="GET" doc:name="Request" doc:id="84c60f38-3ec8-4b6a-b9f3-27749149b466" config-ref="HTTP_Request_configuration" path="/aaa"/>
 		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="1fee943d-c1ed-435b-a18d-d5d611313ebb" />
-		<logger level="INFO" doc:name="Logger" doc:id="235c370f-b989-4ba5-b8e5-fa55bb57de9b" message="completed"/>
+		<logger level="INFO" doc:name="Logger" doc:id="235c370f-b989-4ba5-b8e5-fa55bb57de9b" message="completed project"/>
 	</flow>
 	<flow name="bookTicket" doc:id="16c352fe-7f47-4e25-9041-29d73838d671" >
 		<ee:transform doc:name="Transform Message" doc:id="e551d629-9574-4616-902e-9ef995653c36" >
