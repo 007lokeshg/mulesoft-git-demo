@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="6abc1308-6f40-41be-958f-5689432ae059" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="4dbfe9ae-4742-4289-8965-a88576d33b7e" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="8ace77fb-22b6-45ef-81ef-aba9715a281d" >
+		<http:request-connection host="localhost" port="8082" />
+	</http:request-config>
+	<flow name="dynamic_flowrefernceFlow" doc:id="a3a02c01-354f-4d3a-a391-2425adbcc6fd" >
+		<http:listener doc:name="Listener" doc:id="5af9cf79-b871-4cf2-88cf-3148dc8b213a" config-ref="HTTP_Listener_config" path="/ticket"/>
+		<ee:transform doc:name="Transform Message" doc:id="90f1f0f0-b9a2-4d0f-b502-7faa7273fa68" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="flowRef" ><![CDATA[%dw 2.0
+output application/json
+---
+if (payload.Ticket == "Book")
+	"bookTicket"
+else if (payload.Ticket == "Check")
+	"checkTicketAvailability"
+else if (payload.Ticket == "Cancel")
+	"cancelTicket"
+else null]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="2feb2574-e669-4344-9770-d29d3e98601e" name="#[vars.flowRef]" target="name"/>
+		<logger level="INFO" doc:name="Logger" doc:id="67f04b3e-9d98-4686-acdc-8ff76e5e5100" message="#[payload]" />
+		<http:request method="GET" doc:name="Request" doc:id="84c60f38-3ec8-4b6a-b9f3-27749149b466" config-ref="HTTP_Request_configuration" path="/aaa"/>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="1fee943d-c1ed-435b-a18d-d5d611313ebb" />
+		<logger level="INFO" doc:name="Logger" doc:id="235c370f-b989-4ba5-b8e5-fa55bb57de9b" message="completed"/>
+	</flow>
+	<flow name="bookTicket" doc:id="16c352fe-7f47-4e25-9041-29d73838d671" >
+		<ee:transform doc:name="Transform Message" doc:id="e551d629-9574-4616-902e-9ef995653c36" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "Response" : "Your Ticket has been booked successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dynamic_flowrefernceFlow1" doc:id="a29b0121-8fc4-4b45-8ef1-6a2dc64e42c5" >
+		<http:listener doc:name="Listener" doc:id="10a541a6-6338-4a43-8450-65fbc8c301b4" config-ref="HTTP_Listener_config1" path="/aaa"/>
+		<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"message ": "attributes changed"&#10;}]' doc:name="Set Payload" doc:id="2a220f70-e9b0-4628-8c41-d66a935076e1" />
+	</flow>
+	<flow name="checkTicketAvailability" doc:id="936fde05-5daf-427e-82b1-210e8553e3cb" >
+		<ee:transform doc:name="Transform Message" doc:id="37c50eb4-6e80-453d-8755-dc82aeeaec02" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Response": "Yes ticket are available  and you can book"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="cancelTicket" doc:id="00aeb877-cd9e-4b56-b4ee-52365e552eb8" >
+		<ee:transform doc:name="Transform Message" doc:id="16fce2b0-3f9d-4706-b78f-9133addc6f5b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Response": "your cancellation is successful"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
